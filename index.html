@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Conditionals</title>
+</head>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+<style>
+    div.col-xs-3 {
+        text-align: center;
+    }
+
+    .variable {
+        background-color: grey;
+        display: inline-block;
+        height: 30vmin;
+        width: 30vmin;
+        border-radius: 100%;
+    }
+
+    .redVariable {
+        background-color: crimson;
+    }
+
+    .greenVariable {
+        background-color: lightgreen;
+    }
+
+    .blueVariable {
+        background-color: deepskyblue;
+    }
+
+    .cellTrue {
+        background-color: green;
+    }
+    .cellFalse {
+        color: red;
+    }
+    .headerTrue {
+        color: green;
+    }
+    .headerFalse {
+        color: red;
+    }
+
+</style>
+<script src="https://code.jquery.com/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script>
+    var game = {
+        red : 0,
+        green : 0,
+        blue : 0,
+        addDotsButton : function() {
+            game.removeClickHandlers();
+            game.addDotClickHandler();
+        },
+        removeDotsButton : function() {
+            game.removeClickHandlers();
+            game.subtractDotClickHandler();
+        },
+        removeClickHandlers : function() {
+            $('#variableArea').off('click');
+        },
+        addDotClickHandler : function() {
+            $('#variableArea').on('click', '.variable', function() {
+                var color = $(this).attr('variable');
+                var variable = game[color] += 1;
+                console.log(variable);
+                $(this).text(variable);
+                game.checkAllConditionals();
+            });
+        },
+        subtractDotClickHandler : function() {
+            $('#variableArea').on('click', '.variable', function() {
+                var color = $(this).attr('variable');
+                if (game[color] > 0) {
+                    var variable = game[color] -=1;
+                    $(this).text(variable);
+                    game.checkAllConditionals();
+                }
+            });
+        },
+        mapArray : [[], [], [], []],
+        leftColumnCheck : function() {},
+        checkAllConditionals : function() {
+            var oneConditional = null;
+            var columnCheck = 0;
+            for (var rowCheck = 0; rowCheck < 4; rowCheck++) {
+                var domHeader = $("[row='" + rowCheck + "'][column='0']");
+                oneConditional = domHeader.text().split(' ');
+                game.checkOneConditional(oneConditional, rowCheck, columnCheck, domHeader);
+            }
+            rowCheck = 0;
+            for (columnCheck = 0; columnCheck < 4; columnCheck++) {
+                domHeader = $("[row='0'][column='" + columnCheck + "']");
+                oneConditional = domHeader.text().split(' ');
+                game.checkOneConditional(oneConditional, rowCheck, columnCheck, domHeader);
+            }
+            game.checkMatrixConditionals();
+        },
+        checkMatrixConditionals : function() {
+            for (var rowCheck = 1; rowCheck < game.mapArray.length; rowCheck++) {
+                for (var columnCheck = 1; columnCheck < game.mapArray[0].length; columnCheck++) {
+                    var domCell = $("[row='" + rowCheck + "'][column='" + columnCheck + "']");
+                    if (domCell.text() === "&&") {
+                        if (game.mapArray[rowCheck][0] && game.mapArray[0][columnCheck]) {
+                            game.mapArray[rowCheck][columnCheck] = true;
+                            domCell.removeClass('cellFalse');
+                            domCell.addClass('cellTrue');
+                        } else {
+                            game.mapArray[rowCheck][columnCheck] = false;
+                            domCell.removeClass('cellTrue');
+                            domCell.addClass('cellFalse');
+                        }
+                    } else if (domCell.text() === "||") {
+                        if (game.mapArray[rowCheck][0] || game.mapArray[0][columnCheck]) {
+                            game.mapArray[rowCheck][columnCheck] = true;
+                            domCell.removeClass('cellFalse');
+                            domCell.addClass('cellTrue');
+                        } else {
+                            game.mapArray[rowCheck][columnCheck] = false;
+                            domCell.removeClass('cellTrue');
+                            domCell.addClass('cellFalse');
+                        }
+                    }
+                }
+            }
+        },
+        checkOneConditional : function(singleConditional, rowCheck, columnCheck, domHeader) {
+            for (var i = 0; i < 3; i += 2) {
+                if(isNaN(singleConditional[i])) {
+                    singleConditional[i] = game[singleConditional[i]];
+                    console.log(singleConditional[i])
+                } else {
+                    singleConditional[i] = parseInt(singleConditional[i])
+                }
+            }
+            switch (singleConditional[1]) {
+                case '===':
+                    if (singleConditional[0] === singleConditional[2]) {
+                        game.mapArray[rowCheck][columnCheck] = true;
+                        domHeader.removeClass('headerFalse');
+                        domHeader.addClass('headerTrue');
+                    } else {
+                        game.mapArray[rowCheck][columnCheck] = false;
+                        domHeader.removeClass('headerTrue');
+                        domHeader.addClass('headerFalse');
+                    }
+                    break;
+                case '!==':
+                    if (singleConditional[0] !== singleConditional[2]) {
+                        game.mapArray[rowCheck][columnCheck] = true;
+                        domHeader.removeClass('headerFalse');
+                        domHeader.addClass('headerTrue');
+                    } else {
+                        game.mapArray[rowCheck][columnCheck] = false;
+                        domHeader.removeClass('headerTrue');
+                        domHeader.addClass('headerFalse');
+                    }
+                    break;
+                case '>':
+                    if (singleConditional[0] > singleConditional[2]) {
+                        game.mapArray[rowCheck][columnCheck] = true;
+                        domHeader.removeClass('headerFalse');
+                        domHeader.addClass('headerTrue');
+                    } else {
+                        game.mapArray[rowCheck][columnCheck] = false;
+                        domHeader.removeClass('headerTrue');
+                        domHeader.addClass('headerFalse');
+                    }
+                    break;
+                case '>=':
+                    if (singleConditional[0] >= singleConditional[2]) {
+                        game.mapArray[rowCheck][columnCheck] = true;
+                        domHeader.removeClass('headerFalse');
+                        domHeader.addClass('headerTrue');
+                    } else {
+                        game.mapArray[rowCheck][columnCheck] = false;
+                        domHeader.removeClass('headerTrue');
+                        domHeader.addClass('headerFalse');
+                    }
+                    break;
+                case '<':
+                    if (singleConditional[0] < singleConditional[2]) {
+                        game.mapArray[rowCheck][columnCheck] = true;
+                        domHeader.removeClass('headerFalse');
+                        domHeader.addClass('headerTrue');
+                    } else {
+                        game.mapArray[rowCheck][columnCheck] = false;
+                        domHeader.removeClass('headerTrue');
+                        domHeader.addClass('headerFalse');
+                    }
+                    break;
+                case '<=':
+                    if (singleConditional[0] <= singleConditional[2]) {
+                        game.mapArray[rowCheck][columnCheck] = true;
+                        domHeader.removeClass('headerFalse');
+                        domHeader.addClass('headerTrue');
+                    } else {
+                        game.mapArray[rowCheck][columnCheck] = false;
+                        domHeader.removeClass('headerTrue');
+                        domHeader.addClass('headerFalse');
+                    }
+                    break;
+                default:
+                    game.mapArray[rowCheck][columnCheck] = null;
+            }
+        }
+    };
+    $(document).ready(function() {
+        $('#addButton').on('click', game.addDotsButton);
+        $('#removeButton').on('click', game.removeDotsButton);
+    });
+
+</script>
+<body>
+<div id="buttonArea" class="row">
+    <div class="col-xs-3">
+    </div>
+    <div id="addButton" class="col-xs-3">
+        <button class="btn btn-success">Add Dots</button>
+    </div>
+    <div class="col-xs-3">
+        <button id="removeButton"class="btn btn-danger">Remove Dots</button>
+    </div>
+    <div class="col-xs-3"></div>
+</div>
+<div id="variableArea">
+    <div class="col-xs-4">
+        <div class="variable redVariable" variable="red">
+            0
+        </div>
+    </div>
+    <div class="col-xs-4">
+        <div class="variable greenVariable" variable="green">
+            0
+        </div>
+    </div>
+    <div class="col-xs-4">
+        <div class="variable blueVariable" variable="blue">
+            0
+        </div>
+    </div>
+</div>
+<div id="tableArea">
+    <table class="table table-bordered">
+        <tr>
+            <th row=0 column=0></th>
+            <th row=0 column=1>red === blue</th>
+            <th row=0 column=2>blue < red</th>
+            <th row=0 column=3>green > blue</th>
+        </tr>
+        <tr>
+            <th row=1 column=0>green === 3</th>
+            <td row=1 column=1>&&</td>
+            <td row=1 column=2>||</td>
+            <td row=1 column=3>&&</td>
+        </tr>
+        <tr>
+            <th row=2 column=0>blue !== Red</th>
+            <td row=2 column=1>||</td>
+            <td row=2 column=2>&&</td>
+            <td row=2 column=3>&&</td>
+        </tr>
+        <tr>
+            <th row=3 column=0>green > 2</th>
+            <td row=3 column=1>&&</td>
+            <td row=3 column=2>&&</td>
+            <td row=3 column=3>&&</td>
+        </tr>
+    </table>
+</div>
+
+
+</body>
+</html>
